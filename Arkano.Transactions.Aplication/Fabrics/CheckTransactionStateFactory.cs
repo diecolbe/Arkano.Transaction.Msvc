@@ -9,19 +9,9 @@ namespace Arkano.Transactions.Aplication.Fabrics
         {
             return status switch
             {
-                TransactionStatus.Pending => new CheckTransactionStateDto(TransactionStatus.Pending)
-                {
-                    State = TransactionStatus.Pending
-
-                },
-                TransactionStatus.Approved => new CheckTransactionStateDto(TransactionStatus.Approved)
-                {
-                    State = TransactionStatus.Approved,
-                },
-                TransactionStatus.Rejected => new CheckTransactionStateDto(TransactionStatus.Rejected)
-                {
-                    State = TransactionStatus.Rejected
-                },
+                TransactionStatus.Pending => new CheckTransactionStateDto(TransactionStatus.Pending),
+                TransactionStatus.Approved => new CheckTransactionStateDto(TransactionStatus.Approved),
+                TransactionStatus.Rejected => new CheckTransactionStateDto(TransactionStatus.Rejected),
                 _ => throw new ArgumentOutOfRangeException(nameof(status), "Invalid transaction status.")
             };
         }

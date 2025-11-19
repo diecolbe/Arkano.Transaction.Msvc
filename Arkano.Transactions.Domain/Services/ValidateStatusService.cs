@@ -8,9 +8,9 @@ namespace Arkano.Transactions.Domain.Services
         {
             return status switch
             {
-                TransactionStatus.Approved => "Aprobada",
-                TransactionStatus.Rejected => "Rechazada",
-                TransactionStatus.Pending => "Pendiente",
+                TransactionStatus.Approved => "La transacción fue Aprobada",
+                TransactionStatus.Rejected => "La transacción fue Rechazada",
+                TransactionStatus.Pending => "La transacción esta pendiente de validación",
                 _ => throw new ArgumentException("Estado de transacción inválido.", nameof(status))
             };
         }

@@ -23,7 +23,7 @@ namespace Arkano.Transactions.Aplication.Transactions.Queries
 
                 CheckTransactionStateDto checkTransactionStateDto = _checkFactory.FromStatus(status);
 
-                return _resultFactory.Success(checkTransactionStateDto);
+                return _resultFactory.Success(checkTransactionStateDto, ValidateStatusService.Status(status));
             }
             catch (ArgumentException)
             {

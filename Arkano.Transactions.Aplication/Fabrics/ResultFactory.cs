@@ -28,7 +28,7 @@ namespace Arkano.Transactions.Aplication.Fabrics
 
         public ResultRequest<Guid> TransactionCreated(Guid id, string? message = null)
         {
-            return ResultRequest<Guid>.Created(id, message ?? "Transaction created successfully");
+            return ResultRequest<Guid>.Created(id, message ?? "Transacción creada exitosamente");
         }
     }
 }

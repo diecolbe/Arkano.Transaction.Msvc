@@ -9,7 +9,6 @@ namespace Arkano.Transactions.Infraestructure.Adapters
 {
     public class TransactionRepository(TransactionsDbContext dbContext) : ITransactionRepository
     {
-
         public async Task<Guid> CreateAsync(Transaction transaction, CancellationToken cancellationToken = default)
         {
             dbContext.Transactions.Add(transaction);
@@ -36,8 +35,19 @@ namespace Arkano.Transactions.Infraestructure.Adapters
         }
 
         public async Task UpdateAsync(Transaction transaction, CancellationToken cancellationToken = default)
-        {
-            dbContext.Transactions.Update(transaction);
+        {            
+            var trackedEntity = dbContext.Entry(transaction);
+            
+            if (trackedEntity.State == EntityState.Detached)
+            {                
+                dbContext.Transactions.Attach(transaction);
+                trackedEntity.State = EntityState.Modified;
+            }
+            else
+            {                
+                dbContext.Transactions.Update(transaction);
+            }
+            
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }

@@ -16,8 +16,6 @@ services:
     image: confluentinc/cp-zookeeper:5.5.3
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-    networks:
-      - arkano-network
 
   kafka:
     image: confluentinc/cp-enterprise-kafka:5.5.3
@@ -65,7 +63,6 @@ services:
       - kafka
     networks:
       - arkano-network
-
 volumes:
   postgres_data:
 

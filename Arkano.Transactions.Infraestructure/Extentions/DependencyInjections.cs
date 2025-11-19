@@ -1,5 +1,4 @@
 ﻿using Ardalis.Specification;
-using Arkano.Transactions.Aplication.Fabrics;
 using Arkano.Transactions.Domain.Attributes;
 using Arkano.Transactions.Domain.Ports;
 using Arkano.Transactions.Infraestructure.Adapters;
@@ -14,18 +13,26 @@ namespace Arkano.Transactions.Infraestructure.Extentions
     {
         public static void AddInfraestructure(this IServiceCollection services, IConfiguration configuration)
         {
+            // Configurar Npgsql para manejar DateTime como UTC por defecto
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
+            
             services
                 .AddDomainServices()
-                .AddPersistence(configuration)
-                .AddKafkaServices(configuration);
+                .AddPersistence(configuration);
+                
+            // Usar el método AddKafkaServices que ya existe en KafkaExtension
+            services.AddKafkaServices(configuration);
         }
 
         private static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<TransactionsDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            {
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            });
 
             services.AddTransient<ITransactionRepository, TransactionRepository>();
+            services.AddTransient<IDailyTotalRepository, DailyTotalRepository>();
 
             return services;
         }

@@ -481,11 +481,16 @@ public class TransactionByExternalIdSpec : Specification<Transaction>
 #### **Repository Pattern**
 - **Abstracción**: Interfaces en Domain layer
 - **Implementación**: Adaptadores en Infrastructure
-- **Unit of Work**: Transacciones de base de datos
+- **Direct DbContext**: Cada repositorio maneja sus propias transacciones
 
 #### **Adapter Pattern**
 - **KafkaServiceBus**: Adapta Kafka a IEventBus
 - **TransactionRepository**: Adapta EF Core a ITransactionRepository
+
+#### **Specification Pattern**
+- **Query Specifications**: Encapsula lógica de consultas complejas
+- **Composable Queries**: Reutilización de criterios de filtrado
+- **TransactionByExternalIdSpec**: Especificación para búsquedas por ID externo
 
 ---
 

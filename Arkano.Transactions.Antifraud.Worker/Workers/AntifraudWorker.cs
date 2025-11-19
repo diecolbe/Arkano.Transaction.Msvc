@@ -19,11 +19,9 @@ namespace Arkano.Transactions.Antifraud.Worker.Workers
         IEventBus eventBus)
         : KafkaConsumerBase<TransactionCreatedEvent>(configuration, logger, configuration["Kafka:TransactionCreatedTopic"] ?? "transaction-created")
     {
-        private readonly ILogger<AntifraudWorker> _logger = logger;
-
         protected override async Task ProcessMessageAsync(TransactionCreatedEvent message, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Procesando evento de transacción creada: {Subject}", message.Subject);
+            logger.LogInformation("Procesando evento de transacción creada: {Subject}", message.Subject);
 
             try
             {
@@ -36,23 +34,23 @@ namespace Arkano.Transactions.Antifraud.Worker.Workers
 
                 if (transactionData == null)
                 {
-                    _logger.LogWarning("Error al deserializar los datos de la transacción desde el evento");
+                    logger.LogWarning("Error al deserializar los datos de la transacción desde el evento");
                     return;
                 }
 
-                _logger.LogInformation("Procesando transacción {TransactionExternalId} con valor {Value} y total diario {DailyTotal}",
+                logger.LogInformation("Procesando transacción {TransactionExternalId} con valor {Value} y total diario {DailyTotal}",
                     transactionData.TransactionExternalId, transactionData.Value, transactionData.TotalValueDaily);
 
                 var validationResult = validationService.ValidateTransaction(transactionData);
-                
+
                 var validationDto = transactionValidatedDtoFabric.Create(validationResult);
-                
+
                 await eventBus.PublishAsync(
                     kafkaOptions.Value.TransactionValidatedTopic,
                     new TransactionValidatedEvent(validationDto),
                     cancellationToken);
 
-                _logger.LogInformation("Validación de transacción {TransactionExternalId} completada. Válida: {IsValid}, Estado: {Status}, Razón: {Reason}",
+                logger.LogInformation("Validación de transacción {TransactionExternalId} completada. Válida: {IsValid}, Estado: {Status}, Razón: {Reason}",
                     validationResult.TransactionExternalId,
                     validationResult.IsValid,
                     validationResult.IsValid ? "Aprobada" : "Rechazada",
@@ -60,11 +58,11 @@ namespace Arkano.Transactions.Antifraud.Worker.Workers
             }
             catch (JsonException ex)
             {
-                _logger.LogError(ex, "Error al deserializar los datos de la transacción del mensaje con Subject: {Subject}", message.Subject);
+                logger.LogError(ex, "Error al deserializar los datos de la transacción del mensaje con Subject: {Subject}", message.Subject);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error procesando el evento de transacción creada para Subject: {Subject}", message.Subject);
+                logger.LogError(ex, "Error procesando el evento de transacción creada para Subject: {Subject}", message.Subject);
             }
         }
 
@@ -72,14 +70,14 @@ namespace Arkano.Transactions.Antifraud.Worker.Workers
         {
             if (message.Data is null)
             {
-                _logger.LogWarning("El campo Data del mensaje es nulo");
+                logger.LogWarning("El campo Data del mensaje es nulo");
                 return false;
             }
 
             var dataString = message.Data.ToString();
             if (string.IsNullOrWhiteSpace(dataString))
             {
-                _logger.LogWarning("El campo Data del mensaje está vacío o es solo espacios en blanco");
+                logger.LogWarning("El campo Data del mensaje está vacío o es solo espacios en blanco");
                 return false;
             }
 

@@ -1,23 +1,27 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER app
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Arkano.Antifraud.Transaction.Worker/Arkano.Antifraud.Transaction.Worker.csproj", "Arkano.Antifraud.Transaction.Worker/"]
-RUN dotnet restore "./Arkano.Antifraud.Transaction.Worker/Arkano.Antifraud.Transaction.Worker.csproj"
+
+COPY Arkano.Transactions.Worker/Arkano.Transactions.Worker.csproj Arkano.Transactions.Worker/
+COPY Arkano.Transactions.Aplication/Arkano.Transactions.Aplication.csproj Arkano.Transactions.Aplication/
+COPY Arkano.Transactions.Domain/Arkano.Transactions.Domain.csproj Arkano.Transactions.Domain/
+COPY Arkano.Transactions.Infraestructure/Arkano.Transactions.Infraestructure.csproj Arkano.Transactions.Infraestructure/
+
+RUN dotnet restore Arkano.Transactions.Worker/Arkano.Transactions.Worker.csproj
+
 COPY . .
-WORKDIR "/src/Arkano.Antifraud.Transaction.Worker"
-RUN dotnet build "./Arkano.Antifraud.Transaction.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+WORKDIR /src/Arkano.Transactions.Worker
+RUN dotnet build Arkano.Transactions.Worker.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Arkano.Antifraud.Transaction.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish Arkano.Transactions.Worker.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Arkano.Antifraud.Transaction.Worker.dll"]
+ENTRYPOINT ["dotnet", "Arkano.Transactions.Worker.dll"]

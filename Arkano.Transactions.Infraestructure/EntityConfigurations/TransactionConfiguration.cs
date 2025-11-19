@@ -30,6 +30,7 @@ namespace Arkano.Transactions.Infraestructure.EntityConfigurations
                 .IsRequired();
 
             builder.Property(transaction => transaction.CreatedAt)
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
         }
     }
